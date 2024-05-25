@@ -36,9 +36,7 @@ function validateResourses(book) {
     link: Joi.string().uri().required(),
     tag: Joi.string().optional()
 
-       
-
-    })
+       })
 
    return  ResourceSchema.validate(book)
   

@@ -8,6 +8,7 @@ router.get('/api/resources', async (req, res)=> {
     const resource  = await Resource.find().sort("title")
     res.send(resource)
 })
+
 router.get('/api/resources/category/:categoryId', async (req, res) => {
     const categoryId = req.params.categoryId;
 

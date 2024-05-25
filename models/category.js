@@ -21,9 +21,7 @@ function validateCategory(book) {
 
    return  CategorySchema.validate(book)
   
-  
-    
- }
+}
 
  exports.Category = Category
  exports.validate = validateCategory
