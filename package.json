@@ -8,5 +8,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "joi": "^17.13.1",
+    "mongoose": "^8.4.0"
+  }
 }
