@@ -16,7 +16,7 @@ const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 8000;
 
 // MongoDB Atlas-ga ulanib olish
-mongoose.connect(MONGO_URI, {
+mongoose.connect("mongodb+srv://ilkhamburkhonov:yfANUzN7sMadCnYE@cluster0.lm9j4.mongodb.net/Cluster0?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
