@@ -5,44 +5,45 @@ const router = express.Router();
 const { Resource, validate } = require('../models/resource');
 const {Category} = require('../models/category')
 router.get('/api/resources', async (req, res)=> {
-    const resource  = await Resource.find().sort("title")
+    const resource  = await Resource.find().sort("requestId")
     res.send(resource)
 })
-
-router.get('/api/resources/category/:categoryId', async (req, res) => {
-    const categoryId = req.params.categoryId;
+//
+// router.get('/api/resources/category/:categoryId', async (req, res) => {
+//     const categoryId = req.params.categoryId;
+//
+//     try {
+//         // Find resources belonging to the specified category
+//         const resources = await Resource.find({ category: categoryId });
+//         if (resources.length === 0) {
+//             return res.status(404).send('No resources found for this category ID');
+//         }
+//         res.send(resources);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send('Internal Server Error');
+//     }
+// });
+router.get('/api/resources/:pinfl', async (req, res) => {
+    const pinfl = req.params.pinfl;
 
     try {
-        // Find resources belonging to the specified category
-        const resources = await Resource.find({ category: categoryId });
+        // Find resources by coBorrower (PINFL)
+        const resources = await Resource.find({ coBorrower: pinfl });
         if (resources.length === 0) {
-            return res.status(404).send('No resources found for this category ID');
+            return res.status(404).json({ message: 'No resources found for this PINFL' });
         }
-        res.send(resources);
+        res.json(resources);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-router.get('/api/resources/author/:authorId', async (req, res) => {
-    const authorId = req.params.authorId;
 
-    try {
-        // Find resources authored by the specified author
-        const resources = await Resource.find({ author: authorId });
-        if (resources.length === 0) {
-            return res.status(404).send('No resources found for this author ID');
-        }
-        res.send(resources);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error');
-    }
-});
 
 
 router.post('/api/resources', async (req, res) => {
-    const { title, category, author, link, tag } = req.body;
+    const { requestId, coBorrower} = req.body;
 
     // Validate the request body
     const { error } = validate(req.body);
@@ -53,11 +54,8 @@ router.post('/api/resources', async (req, res) => {
     try {
         // Create a new resource
         const resource = new Resource({
-            title,
-            category,
-            author,
-            link,
-            tag
+            requestId,
+            coBorrower,
         });
 
         // Save the resource to the database
