@@ -4,33 +4,47 @@ if (process.env.NODE_ENV !== "production") {
 
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const category = require('./routes/categories');
-const author = require('./routes/authors'); // ✅ 'auhtor' ni 'author' ga o'zgartirdim
+const author = require('./routes/authors');
 const resource = require('./routes/resources');
 
 const app = express();
 app.use(express.json());
 
-const MONGO_URI = process.env.MONGO_URI;
+// ✅ Enable CORS (Allow all origins temporarily)
+app.use(cors());
+
+// ✅ Allow specific origins (Recommended for production)
+// app.use(cors({
+//     origin: "https://your-frontend-domain.com",
+//     methods: "GET,POST,PUT,DELETE",
+//     allowedHeaders: "Content-Type,Authorization"
+// }));
+
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://ilkhamburkhonov:yfANUzN7sMadCnYE@cluster0.lm9j4.mongodb.net/Cluster0?retryWrites=true&w=majority";
 const PORT = process.env.PORT || 8000;
 
-// MongoDB Atlas-ga ulanib olish
-mongoose.connect("mongodb+srv://ilkhamburkhonov:yfANUzN7sMadCnYE@cluster0.lm9j4.mongodb.net/Cluster0?retryWrites=true&w=majority", {
+// ✅ MongoDB Atlas connection
+mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-    .then(() => console.log("✅ Mongodb Atlas-ga ulanish amalga oshirildi..."))
-    .catch((err) => console.error("❌ MongoDB ulanishida xatolik:", err));
+    .then(() => console.log("✅ MongoDB Atlas connected successfully..."))
+    .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-app.use("/", category);
-app.use("/", author);
-app.use("/", resource);
+// ✅ Use Routes
+app.use("/api/categories", category);
+app.use("/api/authors", author);
+app.use("/api/resources", resource);
 
+// ✅ Test Route
 app.get("/", (req, res) => {
     res.send("Hello world");
 });
 
+// ✅ Start Server
 app.listen(PORT, () => {
-    console.log(`🚀 Server ${PORT} portda ishga tushdi...`);
+    console.log(`🚀 Server running on port ${PORT}...`);
 });
