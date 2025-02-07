@@ -35,9 +35,9 @@ mongoose.connect(MONGO_URI, {
     .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ Use Routes
-app.use("/api/categories", category);
-app.use("/api/authors", author);
-app.use("/api/resources", resource);
+app.use("/", category);
+app.use("/", author);
+app.use("/", resource);
 
 // ✅ Test Route
 app.get("/", (req, res) => {
