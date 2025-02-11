@@ -1,37 +1,42 @@
-// routes/resources.js
-
 const express = require('express');
 const router = express.Router();
 const { Resource, validate } = require('../models/resource');
-const {Category} = require('../models/category')
-router.get('/api/resources', async (req, res)=> {
-    const resource  = await Resource.find().sort("requestId")
-    res.send(resource)
-})
-//
-// router.get('/api/resources/category/:categoryId', async (req, res) => {
-//     const categoryId = req.params.categoryId;
-//
-//     try {
-//         // Find resources belonging to the specified category
-//         const resources = await Resource.find({ category: categoryId });
-//         if (resources.length === 0) {
-//             return res.status(404).send('No resources found for this category ID');
-//         }
-//         res.send(resources);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send('Internal Server Error');
-//     }
-// });
-router.get('/api/resources/:pinfl', async (req, res) => {
-    const pinfl = req.params.pinfl;
+
+// Get all resources, sorted by requestId
+router.get('/api/resources', async (req, res) => {
+    try {
+        const resources = await Resource.find().sort("requestId");
+        res.send(resources);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+// Get a single resource by requestId
+router.get('/api/resources/request/:requestId', async (req, res) => {
+    const { requestId } = req.params;
 
     try {
-        // Find resources by coBorrower (PINFL)
+        const resource = await Resource.findOne({ requestId });
+        if (!resource) {
+            return res.status(404).json({ message: 'Resource not found' });
+        }
+        res.json(resource);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+// Get resources by coBorrower's PINFL
+router.get('/api/resources/coBorrower/:pinfl', async (req, res) => {
+    const { pinfl } = req.params;
+
+    try {
         const resources = await Resource.find({ coBorrower: pinfl });
         if (resources.length === 0) {
-            return res.status(404).json({ message: 'No resources found for this PINFL' });
+            return res.status(404).json({ message: 'No resources found for this coBorrower PINFL' });
         }
         res.json(resources);
     } catch (err) {
@@ -40,15 +45,30 @@ router.get('/api/resources/:pinfl', async (req, res) => {
     }
 });
 
+// Get resources by borrower's PINFL (user can get their own)
+router.get('/api/resources/borrower/:pinfl', async (req, res) => {
+    const { pinfl } = req.params;
 
+    try {
+        const resources = await Resource.find({ borrower: pinfl });
+        if (resources.length === 0) {
+            return res.status(404).json({ message: 'No resources found for this borrower PINFL' });
+        }
+        res.json(resources);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
+// Create a new resource
 router.post('/api/resources', async (req, res) => {
-    const { requestId, coBorrower} = req.body;
+    const { requestId, coBorrower, borrower, params } = req.body;
 
-    // Validate the request body
+    // Validate request body
     const { error } = validate(req.body);
     if (error) {
-        return res.status(400).send(error.details[0].message);
+        return res.status(400).json({ message: error.details[0].message });
     }
 
     try {
@@ -56,16 +76,17 @@ router.post('/api/resources', async (req, res) => {
         const resource = new Resource({
             requestId,
             coBorrower,
+            borrower,
+            params
         });
 
         // Save the resource to the database
         await resource.save();
 
-        // Send the newly created resource in the response
-        res.status(201).send(resource);
+        res.status(201).json(resource);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
