@@ -24,9 +24,9 @@ const resourceSchema = new mongoose.Schema({
         coborrowerPhoneNumber: { type: String, default: "" },
         transactionCards: [
             {
-                cardNumber: { type: String, required: true },
-                cardType: { type: String, required: true },
-                expiryDate: { type: String, required: true }
+                account: { type: String, required: true },
+                type: { type: String, required: true },
+                expiry: { type: String, required: true }
             }
         ]
     }
@@ -58,9 +58,9 @@ function validateResources(resource) {
             coborrowerPhoneNumber: Joi.string().allow(""),
             transactionCards: Joi.array().items(
                 Joi.object({
-                    cardNumber: Joi.string().required(),
-                    cardType: Joi.string().required(),
-                    expiryDate: Joi.string().required()
+                    account: Joi.string().required(),
+                    type: Joi.string().required(),
+                    expiry: Joi.string().required()
                 })
             ).required()
         }).required()
