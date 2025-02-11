@@ -49,7 +49,7 @@ function validateResources(resource) {
             amount: Joi.number().required(),
             gracePeriod: Joi.number().required(),
             repaymentType: Joi.string().required(),
-            paymentDate: Joi.string().required(),
+            paymentDate: Joi.number().required(),
             insuranceCode: Joi.string().required(),
             married: Joi.boolean().required(),
             spousePinfl: Joi.string().required(),
