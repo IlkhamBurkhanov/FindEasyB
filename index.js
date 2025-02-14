@@ -6,9 +6,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-const category = require('./routes/categories');
+const statusRoutes = require('./routes/status'); // Import the status routes
 const author = require('./routes/authors');
 const resource = require('./routes/resources');
+const progress = require('./routes/progress');
 
 const app = express();
 app.use(express.json());
@@ -35,9 +36,11 @@ mongoose.connect(MONGO_URI, {
     .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ Use Routes
-app.use("/", category);
+// app.use("/", category);
 app.use("/", author);
 app.use("/", resource);
+app.use("/", statusRoutes); // Added the status routes
+app.use("/", progress);
 
 // ✅ Test Route
 app.get("/", (req, res) => {
