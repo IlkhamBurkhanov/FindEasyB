@@ -84,13 +84,13 @@ router.put('/progress/:requestId/substage/:pinfl', async (req, res) => {
     subStage.status = status;
 
     // Asosiy progress statusini avtomatik yangilash
-    const allCompleted = progress.subStages.every(s => s.status === 'completed');
-    const anyFailed = progress.subStages.some(s => s.status === 'failed');
+    const allCompleted = progress.subStages.every(s => s.status === 'application_signed_co');
+    const anyFailed = progress.subStages.some(s => s.status === 'refucal_client');
 
     if (anyFailed) {
-        progress.status = 'failed';
+        progress.status = 'refucal_bank';
     } else if (allCompleted) {
-        progress.status = 'completed';
+        progress.status = 'approved_coborrower';
     }
 
     await progress.save();
