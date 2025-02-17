@@ -12,6 +12,26 @@ router.get('/api/resources', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+// Get resources by spousePinfl
+router.get('/api/resources/spouse/:spousePinfl', async (req, res) => {
+    const { spousePinfl } = req.params;
+
+    try {
+        // Ensure spousePinfl is treated as a string
+        const resources = await Resource.find({ "params.spousePinfl": String(spousePinfl) });
+
+        if (!resources || resources.length === 0) {
+            return res.status(404).json({ message: 'No resources found for this spouse PINFL' });
+        }
+
+        res.json(resources);
+    } catch (err) {
+        console.error('Error fetching spousePinfl data:', err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+
 
 // Get a single resource by requestId
 router.get('/api/resources/request/:requestId', async (req, res) => {
