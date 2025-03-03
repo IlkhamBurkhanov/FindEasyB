@@ -3,16 +3,32 @@ const { Progress, SubStage, validateProgress, validateSubStage } = require('../m
 const router = express.Router();
 
 // ✅ 1. Asosiy progress yaratish
+// router.post('/progress', async (req, res) => {
+//     const { error } = validateProgress(req.body);
+//     if (error) return res.status(400).send(error.details[0].message);
+//
+//     const { requestId, status, pinfl } = req.body;
+//
+//     let existingProgress = await Progress.findOne({ requestId });
+//     if (existingProgress) return res.status(400).send('Request ID already exists.');
+//
+//     const progress = new Progress({ requestId, status, pinfl, subStages: [] });
+//     await progress.save();
+//     res.send(progress);
+// });
 router.post('/progress', async (req, res) => {
-    const { error } = validateProgress(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
-    const { requestId, status, pinfl } = req.body;
+    const { requestId, status, pinfl, subStages = [] } = req.body;
 
     let existingProgress = await Progress.findOne({ requestId });
     if (existingProgress) return res.status(400).send('Request ID already exists.');
 
-    const progress = new Progress({ requestId, status, pinfl, subStages: [] });
+    // ✅ Assign a unique ID to each subStage
+    const updatedSubStages = subStages.map(subStage => ({
+        ...subStage,
+        subStageId: subStage.subStageId || new mongoose.Types.ObjectId().toString()
+    }));
+
+    const progress = new Progress({ requestId, status, pinfl, subStages: updatedSubStages });
     await progress.save();
     res.send(progress);
 });
@@ -61,6 +77,7 @@ router.get('/progress/:requestId/substage/:pinfl', async (req, res) => {
     const progress = await Progress.findOne({ requestId: req.params.requestId });
 
     if (!progress) return res.status(404).send('Progress not found.');
+
 
     const subStage = progress.subStages.find(s => s.pinfl === req.params.pinfl);
     if (!subStage) return res.status(404).send('SubStage not found.');

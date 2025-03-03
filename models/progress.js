@@ -3,9 +3,14 @@ const Joi = require('joi');
 
 // Kichik progress (SubStage) modeli
 const SubStageSchema = new mongoose.Schema({
-    subStageId: { type: String, required: true, unique: true },
+    subStageId: {
+        type: String,
+        default: () => new mongoose.Types.ObjectId().toString(), // Generates a unique ID if not provided
+        required: false  // Allow empty subStages
+
+    },
     documentId: { type: String, required: false },
-    requestId: { type: String, required: true }, // Asosiy progress bilan bog‘liq
+    requestId: { type: String, required: false },
     status: {
         type: String,
         required: true,
@@ -13,7 +18,7 @@ const SubStageSchema = new mongoose.Schema({
         default: 'pending'
     },
     stageName: { type: String, required: false },
-    pinfl: { type: String, required: true }
+    pinfl: { type: String, required: false }
 });
 
 // Asosiy progress (Progress) modeli
@@ -27,19 +32,18 @@ const ProgressSchema = new mongoose.Schema({
     },
     pinfl: { type: String, required: true },
     documentId: { type: String, required: false },
-    subStages: [SubStageSchema] // Kichik progresslar arrayi
+    subStages: { type: [SubStageSchema], default: [] }
 });
 
 const Progress = mongoose.model('Progress', ProgressSchema);
 const SubStage = mongoose.model('SubStage', SubStageSchema);
 
-// Asosiy progress uchun validatsiya
 function validateProgress(data) {
     const schema = Joi.object({
         requestId: Joi.string().required(),
         status: Joi.string().valid('document_genereted', 'face_sign', 'application_signed', 'refusal_bank', 'refusal_client', 'add_coBorrower', 'wait_coBorrower', 'approved_coborrower').required(),
         pinfl: Joi.string().required(),
-        documentId: Joi.string(),
+        documentId: Joi.string().optional(),
     });
     return schema.validate(data);
 }
